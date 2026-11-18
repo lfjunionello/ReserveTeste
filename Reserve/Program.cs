@@ -13,6 +13,30 @@ List<LatamAirlineDto> latamFlightsFilteredList = new List<LatamAirlineDto>();
 List<GolAirlineDto> golFlightsList = new List<GolAirlineDto>();
 List<GolAirlineDto> golFlightsFilteredList = new List<GolAirlineDto>();
 
+using var latamHttpClient = new HttpClient();
+const string latamFlightsUrl =
+    "https://dev.reserve.com.br/airapi/latam/flights?departureCity=Rio%20de%20Janeiro&arrivalCity=S%C3%A3o%20Paulo&departureDate=2027-06-20";
+
+var latamFlightsResponse = await latamHttpClient.GetAsync(latamFlightsUrl);
+latamFlightsResponse.EnsureSuccessStatusCode();
+
+var latamFlights = await latamFlightsResponse.Content.ReadFromJsonAsync<List<LatamAirlineDto>>();
+if (latamFlights is not null)
+{
+    latamFlightsList.AddRange(latamFlights);
+}
+
+const string golFlightsUrl =
+    "https://dev.reserve.com.br/airapi/gol/getavailability?origin=Rio%20de%20Janeiro&destination=S%C3%A3o%20Paulo&date=2027-06-20";
+
+var golFlightsResponse = await latamHttpClient.GetAsync(golFlightsUrl);
+golFlightsResponse.EnsureSuccessStatusCode();
+
+var golFlights = await golFlightsResponse.Content.ReadFromJsonAsync<List<GolAirlineDto>>();
+if (golFlights is not null)
+{
+    golFlightsList.AddRange(golFlights);
+}
 
 var app = builder.Build();
 
@@ -27,9 +51,8 @@ app.UseHttpsRedirection();
 
 app.MapGet("/disponibilidade", (string origem, string destino, DateOnly data) =>
 {
+    normalizedFlightsList.Clear();
 
-
-    
     latamFlightsFilteredList = latamFlightsList.FindAll(flight => 
         flight.DepartureAirport == origem && 
         flight.ArrivalAirport == destino && 
@@ -39,8 +62,6 @@ app.MapGet("/disponibilidade", (string origem, string destino, DateOnly data) =>
         flight.OriginAirport == origem && 
         flight.DestinationAirport == destino && 
         flight.DepartureDate.Date == data.ToDateTime(TimeOnly.MinValue));
-
-
 
     foreach (var latamFlight in latamFlightsFilteredList)
     {
@@ -73,32 +94,16 @@ app.MapGet("/disponibilidade", (string origem, string destino, DateOnly data) =>
 
         normalizedFlightsList.Add(normalizedFlight);
     }
-    return Results.Ok("Disponibilidade");
+
+    var cheapestFlightByAirline = normalizedFlightsList
+        .GroupBy(flight => flight.Companhia)
+        .Select(group => group.MinBy(flight => flight.Tarifa))
+        .Where(flight => flight is not null)
+        .Cast<NormalizedFlightDataDto>()
+        .ToList();
+
+    return Results.Ok(cheapestFlightByAirline);
 });
 
-/* var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi(); */
 
 app.Run();
-
-/* record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-} */

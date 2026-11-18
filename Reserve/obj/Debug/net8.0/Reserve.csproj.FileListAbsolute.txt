@@ -31,3 +31,4 @@ C:\Users\Pokeblev\Documents\Dev\Reserve\Reserve\obj\Debug\net8.0\refint\Reserve.
 C:\Users\Pokeblev\Documents\Dev\Reserve\Reserve\obj\Debug\net8.0\Reserve.pdb
 C:\Users\Pokeblev\Documents\Dev\Reserve\Reserve\obj\Debug\net8.0\Reserve.genruntimeconfig.cache
 C:\Users\Pokeblev\Documents\Dev\Reserve\Reserve\obj\Debug\net8.0\ref\Reserve.dll
+C:\Users\Pokeblev\Documents\Dev\Reserve\Reserve\obj\Debug\net8.0\Reserve.sourcelink.json
