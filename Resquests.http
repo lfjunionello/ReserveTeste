@@ -1,0 +1,9 @@
+Get http://localhost:5070/disponibilidade?origem=Rio%20de%20Janeiro&destino=São%20Paulo&data=2027-06-20
+
+#### LATAM
+
+GET https://dev.reserve.com.br/airapi/latam/flights?departureCity=Rio%20de%20Jan%20eiro&arrivalCity=S%C3%A3%20o%20Paulo&departureDate=2027-06-20
+
+##### GOL
+
+GET https://dev.reserve.com.br/airapi/gol/getavailability?origin=Rio%20de%20Janeiro&destination=S%C3%A3o%20Paulo&date=2027-06-20
