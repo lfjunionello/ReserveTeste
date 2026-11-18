@@ -13,11 +13,16 @@ List<LatamAirlineDto> latamFlightsFilteredList = new List<LatamAirlineDto>();
 List<GolAirlineDto> golFlightsList = new List<GolAirlineDto>();
 List<GolAirlineDto> golFlightsFilteredList = new List<GolAirlineDto>();
 
-using var latamHttpClient = new HttpClient();
+using var flightsHttpClient = new HttpClient();
+
 const string latamFlightsUrl =
     "https://dev.reserve.com.br/airapi/latam/flights?departureCity=Rio%20de%20Janeiro&arrivalCity=S%C3%A3o%20Paulo&departureDate=2027-06-20";
 
-var latamFlightsResponse = await latamHttpClient.GetAsync(latamFlightsUrl);
+const string golFlightsUrl =
+    "https://dev.reserve.com.br/airapi/gol/getavailability?origin=Rio%20de%20Janeiro&destination=S%C3%A3o%20Paulo&date=2027-06-20";
+
+
+var latamFlightsResponse = await flightsHttpClient.GetAsync(latamFlightsUrl);
 latamFlightsResponse.EnsureSuccessStatusCode();
 
 var latamFlights = await latamFlightsResponse.Content.ReadFromJsonAsync<List<LatamAirlineDto>>();
@@ -26,10 +31,8 @@ if (latamFlights is not null)
     latamFlightsList.AddRange(latamFlights);
 }
 
-const string golFlightsUrl =
-    "https://dev.reserve.com.br/airapi/gol/getavailability?origin=Rio%20de%20Janeiro&destination=S%C3%A3o%20Paulo&date=2027-06-20";
 
-var golFlightsResponse = await latamHttpClient.GetAsync(golFlightsUrl);
+var golFlightsResponse = await flightsHttpClient.GetAsync(golFlightsUrl);
 golFlightsResponse.EnsureSuccessStatusCode();
 
 var golFlights = await golFlightsResponse.Content.ReadFromJsonAsync<List<GolAirlineDto>>();
